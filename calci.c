@@ -407,7 +407,7 @@ node* expon(List L1, List L2){
 
 	node *oneNode = (node *)malloc(sizeof(node));
         oneNode->data = 1;
-	oneNode->sign = 1;
+		oneNode->sign = 1;
         oneNode->next = NULL;
 
 	while((L2->data > 0) || (L2->next != NULL)){
