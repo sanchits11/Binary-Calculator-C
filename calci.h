@@ -7,23 +7,21 @@ typedef struct node{
 typedef node* List;
 
 
-//List operations and functions for calculator
-void freeLL(List *L);
+//functions for linked list
+
+void displayList(List L);
+void freeList(List *L);
 void insertNode(List *L, int temp);
-void reverseLL(List *L);
+node *copyList(List L);
+int compareList(List L1, List L2);
+void reverseList(List *L);
+node* listfromChar(char* num);
 void removeZeroes(List* L);
-int compareLL(List L1, List L2);
-
-
-void displayLL(List L);
+int divideInSub(List *temp1, List temp2);
 
 node* addition(List L1, List L2);
 node* subtraction(List L1, List L2);
-node* multiply(List L1, List L2);
-node* divide(List L1, List L2);
-node* expon(List L1, List L2);
-node* square(List L1);
-
-node* handleFunctions(char *expr, int k);
-
+node* multiplication(List L1, List L2);
+node* division(List L1, List L2);
+node* exponent(List L1, List L2);
 node* solveExpr(char *expr);

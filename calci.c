@@ -3,19 +3,31 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <ctype.h>
+
 #include "calci.h"
 #include "stack.h"
 
 
-//evaluation of input to nodes 
-node* solveExpr(char *expr){
-    char *postfix = infixToPostfix(expr);
-	node *result = evaluatePostfix(postfix);
-    return result;
+// display of linked list 
+void displayList(List L){
+	if(!L){
+		return;
+	}
+
+	if(L->sign == -1){
+		printf("-");
+		L->sign = 1;
+	}
+
+	displayList(L->next);
+	printf("%d", L->data);
+
+	return;
 }
 
+
 //delete or free of list of nodes(number)
-void freeLL(List *L) {
+void freeList(List *L) {
     node *temp = NULL;
     while (*L) {
         temp = *L;
@@ -47,7 +59,7 @@ void insertNode(List *L, int temp){
 }
 
 // Function to copy a linked list:
-node *copyLL(List L){
+node *copyList(List L){
 	List newList = NULL;
 
 	while(L){
@@ -59,12 +71,12 @@ node *copyLL(List L){
 }
 
 //returns 1 if temp is greater, 0 if temp and L2 are equal and returns -1 if L2 is greater.
-int compareLL(List L1, List L2){
-	List newL1 = copyLL(L1);
-	List newL2 = copyLL(L2);
+int compareList(List L1, List L2){
+	List newL1 = copyList(L1);
+	List newL2 = copyList(L2);
 
-	reverseLL(&newL1);
-	reverseLL(&newL2);
+	reverseList(&newL1);
+	reverseList(&newL2);
 
 	node *p = newL1;
 	node *q = newL2;
@@ -107,7 +119,7 @@ int compareLL(List L1, List L2){
 }
 
 // Function to reverse a linked list:
-void reverseLL(List *L){
+void reverseList(List *L){
 	if(!(*L)){
 		return;
 	}
@@ -130,7 +142,7 @@ void reverseLL(List *L){
 }
 
 // to get linked list from string array
-node* charToLL(char* num){
+node* listfromChar(char* num){
 	node *L = NULL;
 
 	// If number is zero:
@@ -154,23 +166,6 @@ node* charToLL(char* num){
 	return L;
 }
 
-// display of linked list 
-void displayLL(List L){
-	if(!L){
-		return;
-	}
-
-	if(L->sign == -1){
-		printf("-");
-		L->sign = 1;
-	}
-
-	displayLL(L->next);
-	printf("%d", L->data);
-
-	return;
-}
-
 // Supporting function for subtract function
 void removeZeroes(List* L) {
     node *p = *L;
@@ -185,7 +180,7 @@ void removeZeroes(List* L) {
     if (lastNonZero) {
         p = lastNonZero->next;
         lastNonZero->next = NULL;
-        freeLL(&p);
+        freeList(&p);
     }
 }
 
@@ -225,7 +220,7 @@ node* addition(List L1, List L2){
 node* subtraction(List L1, List L2){
 	int finalsign = 1;
 
-    	if(compareLL(L1, L2) == 0){
+    	if(compareList(L1, L2) == 0){
         	// if the numbers are equal then return 0
 	        node *newnode = (node*) malloc(sizeof(node));
         	newnode->data = 0;
@@ -234,7 +229,7 @@ node* subtraction(List L1, List L2){
 	        
 		return newnode;
     	}
-		else if(compareLL(L1, L2) < 0){
+		else if(compareList(L1, L2) < 0){
 		finalsign = -1;
 
 		List tmp = L1;
@@ -285,7 +280,7 @@ node* subtraction(List L1, List L2){
 }
 
 // multiply function 
-node* multiply(List L1, List L2){
+node* multiplication(List L1, List L2){
     List result = NULL;
 	List prevResult = NULL;
 	List temp = NULL;
@@ -326,7 +321,7 @@ node* multiply(List L1, List L2){
 
 	        // Add the shifted result to the previous result
         	prevResult = addition(result, prevResult);
-        	freeLL(&result);
+        	freeList(&result);
         	L2 = L2->next;
     	}
 
@@ -334,16 +329,16 @@ node* multiply(List L1, List L2){
 }
 
 // to compare continuous subtraction during division
-int divideInSub(List *temp, List L2){
+int divideInSub(List *temp1, List temp2){
 	int ans = 0;
 	List newLL = NULL;
 
-	reverseLL(temp);
+	reverseList(temp1);
 
-	while(compareLL(*temp, L2) >= 0){
-		newLL = subtraction(*temp, L2);
-		freeLL(temp);
-		*temp = newLL;
+	while(compareList(*temp1, temp2) >= 0){
+		newLL = subtraction(*temp1, temp2);
+		freeList(temp1);
+		*temp1 = newLL;
 		ans++;
 	}
 
@@ -352,23 +347,23 @@ int divideInSub(List *temp, List L2){
 
 
 // Function to perform division:
-node* divide(List L1, List L2) {
+node* division(List L1, List L2) {
 	// Check for division by zero
 	node *zeroNode = (node *)malloc(sizeof(node));
 	zeroNode->data = 0;
 	zeroNode->sign = 1;
 	zeroNode->next = NULL;
 
-	if(compareLL(L2, zeroNode) == 0){
+	if(compareList(L2, zeroNode) == 0){
 		printf("Can't divide by zero!\n");
 		exit(1);
 	}
 	
-	if (compareLL(L1, zeroNode) == 0) {
-        	return zeroNode;
-    	}
+	if (compareList(L1, zeroNode) == 0) {
+        return zeroNode;
+    }
 	
-	reverseLL(&L1);
+	reverseList(&L1);
 
 	List temp = NULL;
 	insertNode(&temp, 0);
@@ -378,7 +373,7 @@ node* divide(List L1, List L2) {
 	int k = 0;
 
 	while(p){
-		reverseLL(&temp);
+		reverseList(&temp);
 		if(temp->data == 0){
 			temp->data = p->data;
 		}
@@ -390,36 +385,41 @@ node* divide(List L1, List L2) {
 		p = p->next;
 	}
 
-	reverseLL(&result);
-
+	reverseList(&result);
 	removeZeroes(&result);
 
 	return result;
 }
 
 // Function to find exponent:
-node* expon(List L1, List L2){
+node* exponent(List L1, List L2){
 	List result = NULL;
 	insertNode(&result, 1);
 
 	List temp1 = NULL;
 	List temp2 = NULL;
 
-	node *oneNode = (node *)malloc(sizeof(node));
-        oneNode->data = 1;
-		oneNode->sign = 1;
-        oneNode->next = NULL;
+	node *firstNode = (node *)malloc(sizeof(node));
+        firstNode->data = 1;
+		firstNode->sign = 1;
+        firstNode->next = NULL;
 
 	while((L2->data > 0) || (L2->next != NULL)){
-		temp1 = multiply(result, L1);
-		freeLL(&result);
+		temp1 = multiplication(result, L1);
+		freeList(&result);
 		result = temp1;
 
-		temp2 = subtraction(L2, oneNode);
-		freeLL(&L2);
+		temp2 = subtraction(L2, firstNode);
+		freeList(&L2);
 		L2 = temp2;
 	}
 
 	return result;
 }
 
+//evaluation of input to nodes 
+node* solveExpr(char *expr){
+    char *postfix = infixToPostfix(expr);
+	node *result = evaluatePostfix(postfix);
+    return result;
+}

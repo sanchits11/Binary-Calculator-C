@@ -4,18 +4,12 @@
 #include <string.h>
 #include "calci.h"
 #include "stack.h"
-#include "nodeStack.h"
+#include "nodestack.h"
 
-#define MAX_LEN 100
 
+// stack operations
 void initStack(Stack *s, int n){
 	s->arr = (char *)malloc((sizeof(char)) * n);
-	s->size = n;
-	s->top = -1;
-}
-
-void initNodeStack(nodeStack *s, int n){
-	s->numLL = (node **)malloc((sizeof(node*)) * n);
 	s->size = n;
 	s->top = -1;
 }
@@ -24,16 +18,8 @@ int isFull(Stack *s){
 	return ((s->top) == (s->size) - 1);
 }
 
-int isNodeStackFull(nodeStack *s){
-	 return ((s->top) == (s->size) - 1);
-}
-
 int isEmpty(Stack *s){
 	return ((s->top) == -1);
-}
-
-int isNodeStackEmpty(nodeStack *s){
-        return ((s->top) == -1);
 }
 
 void push(Stack *s, char val){
@@ -42,14 +28,6 @@ void push(Stack *s, char val){
 	}
 	(s->top)++;
 	s->arr[s->top] = val;
-}
-
-void pushNode(nodeStack *s, node *val){
-	if(isNodeStackFull(s)){
-		return;
-	}
-	(s->top)++;
-	s->numLL[s->top] = val;
 }
 
 char pop(Stack *s){
@@ -61,15 +39,6 @@ char pop(Stack *s){
 	return val;
 }
 
-node* popNode(nodeStack *s){
-        if(isNodeStackEmpty(s)){
-                return NULL;
-        }
-        node *val = s->numLL[s->top];
-        (s->top)--;
-        return val;
-}
-
 char peek(Stack *s){
 	if(isEmpty(s)){
 		return '\0';
@@ -78,14 +47,48 @@ char peek(Stack *s){
 	return val;
 }
 
-node* peekNode(nodeStack *s){
-        if(isNodeStackEmpty(s)){
-                return NULL;
-        }
-        node *val = s->numLL[s->top];
-        return val;
+
+//nodestack operations 
+void initNodeStack(nodeStack *s, int n){
+	s->numLL = (node **)malloc((sizeof(node*)) * n);
+	s->size = n;
+	s->top = -1;
 }
 
+int isNodeStackFull(nodeStack *s){
+	return ((s->top) == (s->size) - 1);
+}
+
+int isNodeStackEmpty(nodeStack *s){
+    return ((s->top) == -1);
+}
+
+void pushNode(nodeStack *s, node *val){
+	if(isNodeStackFull(s)){
+		return;
+	}
+	(s->top)++;
+	s->numLL[s->top] = val;
+}
+
+node* popNode(nodeStack *s){
+    if(isNodeStackEmpty(s)){
+        return NULL;
+    }
+    node *val = s->numLL[s->top];
+    (s->top)--;
+    return val;
+}
+
+node* peekNode(nodeStack *s){
+    if(isNodeStackEmpty(s)){
+        return NULL;
+    }
+    node *val = s->numLL[s->top];
+    return val;
+}
+
+//postfix evation operations
 int isOperand(char ch){
 	return isdigit(ch);
 }
@@ -127,9 +130,9 @@ char *infixToPostfix(char *expr){
 			continue;
 		}
 		else if(isdigit(expr[i])){
-			// Reading entire operand as a string:
+			//taking whole operand as string
 			int j = i;
-			char operand[MAX_LEN];
+			char operand[100];
 			int p = 0;
 			
 			while(isdigit(expr[j])){
@@ -137,14 +140,13 @@ char *infixToPostfix(char *expr){
 			}
 			operand[p] = '\0';
 
-			// Copying the operand to postfix expression:
+			// copying to postfix string array
 			for(int q = 0; operand[q] != '\0'; q++){
 				postfix[++k] = operand[q];
 			}
 
 			postfix[++k] = ' ';
 
-			// updating value of i to the end char of the operand:
 			i = j - 1;
 		}
 		else if(expr[i] == '('){
@@ -178,7 +180,7 @@ char *infixToPostfix(char *expr){
 node* evaluatePostfix(char *expr){
 	nodeStack *s = (nodeStack *)malloc(sizeof(nodeStack));
 	int n = strlen(expr);
-        initNodeStack(s, n);
+    initNodeStack(s, n);
 
 	node *x = NULL;
 	node *y = NULL;
@@ -189,16 +191,15 @@ node* evaluatePostfix(char *expr){
 			continue;
 		}	
 		else if(isdigit(expr[i])){
-			// Reading the entire operand as a List:
 			int j = i;
 
 			node *operand = NULL;
 
 			while(isdigit(expr[j])){
-				node *nn = (node *)malloc(sizeof(node));
-				nn->data = expr[j++] - '0';
-				nn->next = operand;
-				operand = nn;
+				node *newnode = (node *)malloc(sizeof(node));
+				newnode->data = expr[j++] - '0';
+				newnode->next = operand;
+				operand = newnode;
 			}
 
 			pushNode(s, operand);
@@ -218,13 +219,13 @@ node* evaluatePostfix(char *expr){
 					result = subtraction(x, y);
 					break;
 				case '*':
-					result = multiply(x, y);
+					result = multiplication(x, y);
 					break;
 				case '/':
-					result = divide(x, y);
+					result = division(x, y);
 					break;
 				case '^':
-					result = expon(x, y);
+					result = exponent(x, y);
 					break;
 			}
 			pushNode(s, result);

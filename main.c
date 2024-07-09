@@ -21,9 +21,9 @@ int main(){
 		}
 		else{
 			ans = solveExpr(expr);
-			displayLL(ans);
+			displayList(ans);
             printf("\n");
-            freeLL(&ans);
+            freeList(&ans);
             ans = NULL;           
 		}
 
